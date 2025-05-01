@@ -145,11 +145,11 @@ GROUP BY vips.assoc_type;
 
 /* Categorize members into three groups (Veteran, Seasoned, Newbie) depending on how long they've been members.*/
 SELECT vips.last_name, vips.first_name, hotels.hotel_name,
-	CASE
+CASE
     WHEN 2025-member_since >= 20 THEN 'Veteran'
     WHEN 2025-member_since >= 10 THEN 'Seasoned'
-ELSE 'Newbie'
-END AS member_status
+    ELSE 'Newbie'
+    END AS member_status
 FROM vips
 LEFT JOIN reservations
 ON vips.member_id = reservations.member_id
@@ -159,13 +159,29 @@ ORDER BY member_status;
 
 /* Does member status have any relation to what hotel members stayed at.*/
 SELECT vips.last_name, vips.first_name, hotels.hotel_name,
-	CASE
+CASE
     WHEN 2025-member_since >= 20 THEN 'Veteran'
     WHEN 2025-member_since >= 10 THEN 'Seasoned'
-ELSE 'Newbie'
-END AS member_status
+    ELSE 'Newbie'
+    END AS member_status
 FROM vips
 LEFT JOIN reservations
 ON vips.member_id = reservations.member_id
 LEFT JOIN hotels
 ON reservations.hotel = hotels.hotel_id;
+
+/* List of members and which events they will be attending (welcome and dinner).*/
+SELECT vips.last_name, vips.first_name,
+CASE
+    WHEN reservations.welcome_rsvp = 1 THEN 'Yes'
+    WHEN reservations.welcome_rsvp = 0 THEN 'No'
+    ELSE 'Did not RSVP'
+    END AS attending_welcome,
+CASE
+    WHEN reservations.dinner_rsvp = 1 THEN 'Yes'
+    WHEN reservations.dinner_rsvp = 0 THEN 'No'
+    ELSE 'Did not RSVP'
+    END AS attending_dinner
+FROM vips
+LEFT JOIN reservations
+ON vips.member_id = reservations.member_id;
