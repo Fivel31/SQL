@@ -185,3 +185,9 @@ CASE
 FROM vips
 LEFT JOIN reservations
 ON vips.member_id = reservations.member_id;
+
+/* Show list of members and who they are giving feedback to.*/
+SELECT v1.member_id, v1.last_name, v1.first_name, v2.last_name feedback_receiver_last_name, v2.first_name feedback_receiver_first_name
+FROM vips v1
+LEFT JOIN vips v2
+ON v1.provides_feedback_to = v2.member_id;
