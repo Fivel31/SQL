@@ -13,3 +13,21 @@ SELECT DISTINCT artist_name, MAX(popularity) AS max_popularity
 FROM BIT_DB.Spotifydata
 GROUP BY artist_name
 ORDER BY max_popularity DESC LIMIT 10;
+
+/* List songs (artist/title) by tempo. */
+SELECT artist_name, track_name,
+    CASE
+        WHEN tempo >= 160 THEN "Extremely fast"
+        WHEN tempo >= 140 THEN "Very fast"
+        WHEN tempo >= 120 THEN "Medium fast"
+        WHEN tempo >= 100 THEN "Medium"
+        WHEN tempo >= 80 THEN "Slow"
+    ELSE "Very slow"
+    END AS song_tempo
+FROM BIT_DB.Spotifydata;  
+
+/* List artists by total amount of song mintues on chart. */
+SELECT artist_name, SUM(duration_ms) AS total_artist_ms
+FROM BIT_DB.Spotifydata
+GROUP BY artist_name  
+ORDER BY total_artist_ms DESC;
