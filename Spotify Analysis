@@ -1,0 +1,15 @@
+/* List how many songs are in each time signature. */
+SELECT time_signature, count(time_signature) 
+FROM BIT_DB.Spotifydata
+GROUP BY time_signature;
+
+/* List top 10 songs. */
+SELECT track_name, artist_name, popularity
+FROM BIT_DB.Spotifydata
+ORDER BY popularity DESC LIMIT 10;
+
+/* List top 10 artists. */
+SELECT DISTINCT artist_name, MAX(popularity) AS max_popularity
+FROM BIT_DB.Spotifydata
+GROUP BY artist_name
+ORDER BY max_popularity DESC LIMIT 10;
