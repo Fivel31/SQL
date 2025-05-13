@@ -52,3 +52,12 @@ SELECT artist_name, SUM(duration_ms) AS total_artist_ms
 FROM BIT_DB.Spotifydata
 GROUP BY artist_name  
 ORDER BY total_artist_ms DESC;
+
+/* Using a CTE to find average popularity and listing artists with popularity >= 90. */
+WITH avg_pop_table AS
+(SELECT artist_name, avg(popularity) AS avg_pop
+FROM Spotifydata
+GROUP BY artist_name)
+SELECT artist_name, avg_pop, "Top Star" AS tag FROM avg_pop_table
+WHERE avg_pop>=90
+ORDER BY avg_pop DESC;
