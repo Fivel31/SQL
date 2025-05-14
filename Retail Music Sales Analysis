@@ -1,0 +1,144 @@
+/* List customers (full name, ID, country) who are not in the USA. */
+SELECT firstname, lastname, customerid, country
+FROM chinook.customers
+WHERE country != 'USA';
+
+/* List customers in Brazil. */
+SELECT firstname, lastname, customerid, country
+FROM chinook.customers
+WHERE country = 'Brazil';
+
+/* List the invoices of customers who are from Brazil. */
+SELECT firstname, lastname, invoiceid, invoicedate, billingcountry 
+FROM chinook.invoices
+LEFT JOIN chinook.customers
+ON customers.customerid = invoices.customerid
+WHERE billingcountry = 'Brazil';
+
+/* List all employees who are Sales Agents. */
+SELECT * 
+FROM chinook.employees
+WHERE title = 'Sales Support Agent';
+
+/* List unique billing countries. */
+SELECT DISTINCT billingcountry
+FROM invoices;
+
+/* List the invoices associated with each sales agent. */
+SELECT employees.firstname, employees.lastname, invoices.invoiceid
+FROM chinook.employees
+JOIN chinook.customers
+ON customers.supportrepid = employees.EmployeeId
+JOIN chinook.invoices
+ON customers.customerid = invoices.CustomerId;
+
+/* List invoice total, customer name, country, and sale agent for all invoices and customers. */
+SELECT customers.firstname AS cust_first, customers.LastName AS cust_last, customers.Country, invoices.InvoiceId, 
+invoices.Total, employees.firstname AS rep_first, employees.lastname AS rep_last
+FROM chinook.employees
+JOIN chinook.customers
+ON customers.supportrepid = employees.EmployeeId
+JOIN chinook.invoices
+ON customers.customerid = invoices.CustomerId;
+
+/* List number of invoices in 2009. */
+SELECT count(*) AS inv_count
+FROM chinook.invoices
+WHERE invoices.InvoiceDate LIKE '2009%';
+
+/* List total sales for 2009. */
+SELECT SUM(invoices.total) AS total_sales
+FROM chinook.invoices
+WHERE invoices.InvoiceDate LIKE '2009%';
+
+/* List invoice line ID with purchased track name. */
+SELECT invoice_items.InvoicelineId, tracks.name
+FROM chinook.invoice_items
+JOIN chinook.tracks
+ON tracks.TrackId = invoice_items.TrackId
+ORDER BY invoice_items.InvoiceLineId;
+
+/* List invoice line ID with purchased track name and artist name. */
+SELECT inv.InvoicelineId, trk.name track_name, art.Name artist_name
+FROM chinook.invoice_items inv
+LEFT JOIN chinook.tracks trk
+ON trk.TrackId = inv.TrackId
+JOIN chinook.albums alb
+ON alb.albumid = trk.albumid
+LEFT JOIN chinook.artists art
+ON art.artistid = alb.artistid;
+
+/* List all tracks with album name, media type, and genre. */
+SELECT trk.name Track, alb.title Album, med.name Media_Type, gen.name Genre
+FROM chinook.tracks trk
+LEFT JOIN chinook.albums alb
+ON trk.albumid = alb.albumid
+JOIN chinook.media_types med
+ON trk.mediatypeid = med.mediatypeid
+JOIN chinook.genres gen
+ON trk.genreid = gen.genreid
+ORDER BY alb.title;
+
+/* List total sales made by each sales agent. */
+SELECT emp.firstname Employee_first, emp.lastname Employee_last, ROUND(SUM(inv.total),2) AS total_sales
+FROM chinook.invoices inv
+JOIN chinook.customers cus
+ON inv.customerid = cus.customerid
+JOIN chinook.employees emp
+ON cus.supportrepid = emp.employeeid
+GROUP BY emp.lastname
+HAVING emp.title = 'Sales Support Agent';
+
+/* List which sales agent made the most dollars in sales in 2009. */
+SELECT emp.firstname Employee_first, emp.lastname Employee_last, ROUND(SUM(inv.total),2) AS total_sales
+FROM chinook.invoices inv
+JOIN chinook.customers cus
+ON inv.customerid = cus.customerid
+JOIN chinook.employees emp
+ON cus.supportrepid = emp.employeeid
+WHERE emp.title = 'Sales Support Agent' 
+AND inv.invoicedate LIKE '2009%' 
+GROUP BY emp.lastname
+ORDER BY total_sales DESC LIMIT 1;
+
+/* List the top 10 customers (name and email) that spent the most money. */
+SELECT cus.firstname, cus.lastname, cus.email, ROUND(SUM(inv.total),2) AS total_spent
+FROM chinook.invoices inv
+LEFT JOIN chinook.customers cus
+ON inv.customerid = cus.customerid
+GROUP BY cus.lastname
+ORDER BY total_spent DESC LImit 10;
+
+/* List total sales by genre of music. */
+SELECT gen.name, ROUND(SUM(inv.total),2) AS total_sales
+FROM chinook.invoices inv
+JOIN chinook.invoice_items ini
+ON ini.invoiceid = inv.invoiceid
+JOIN chinook.tracks trk
+ON ini.trackid = trk.trackid
+JOIN chinook.genres gen
+ON gen.genreid = trk.genreid
+GROUP BY gen.name
+ORDER BY total_sales DESC;
+
+/* List total sales by artist. */
+SELECT art.name, ROUND(SUM(inv.total),2) AS total_sales
+FROM chinook.invoices inv
+JOIN chinook.invoice_items ini
+ON ini.invoiceid = inv.invoiceid
+JOIN chinook.tracks trk
+ON ini.trackid = trk.trackid
+JOIN chinook.albums alb
+ON alb.albumid = trk.albumid
+JOIN chinook.artists art
+ON art.artistid = alb.artistid
+GROUP BY art.name
+ORDER BY total_sales DESC;
+
+/* List what media type is being used most for tracks. */
+SELECT media_types.name, COUNT(media_types.name) AS total
+FROM chinook.tracks
+LEFT JOIN chinook.media_types
+ON tracks.MediaTypeId = media_types.MediaTypeId
+GROUP BY media_types.name
+ORDER BY media_types.name DESC;
